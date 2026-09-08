@@ -68,9 +68,14 @@ Antwoord ALLEEN met geldige JSON, geen uitleg, geen markdown-codeblok, in dit fo
   "image_prompt": "gedetailleerde Engelstalige prompt voor een text-to-image model, \
 geoptimaliseerd voor een verticale 9:16 Reel-still. Beschrijf de COMPOSITIE EXPLICIET, niet \
 alleen sfeerwoorden: (1) benoem het alledaagse object (bv. matchbox, teacup, pocket watch) als \
-duidelijk herkenbaar hoofdonderwerp, scherp in beeld; (2) beschrijf dat de miniatuurwereld \
-zichtbaar IN of OP dat object zit, begrensd door de vorm ervan — geen losse elementen die los \
-van het object in de lucht zweven; (3) benoem de camera-hoek (bv. 'eye-level macro shot', \
+duidelijk herkenbaar hoofdonderwerp, scherp in beeld; (2) beschrijf dat het object omgedraaid, \
+geopend of gekanteld is zodat de HOLLE BINNENKANT naar de camera gericht is, en dat de \
+miniatuurwereld daadwerkelijk IN die holte zit — met zichtbare wanden/rand van het object rondom \
+de wereld die diepte en fysieke omsluiting tonen (bv. 'the thimble is tipped on its side, opening \
+facing the camera, so the viewer looks directly into its hollow interior'). Vermijd expliciet een \
+plat of geprojecteerd effect waarbij de wereld op het buitenoppervlak lijkt te zijn geplakt of \
+geschilderd — het moet ondubbelzinnig een fysieke ruimte zijn waar de kijker in kijkt, geen losse \
+elementen die los van het object in de lucht zweven; (3) benoem de camera-hoek (bv. 'eye-level macro shot', \
 'top-down view into the open box') en waar het onderwerp in het frame staat (bv. 'object \
 centered, filling the lower two-thirds of the vertical frame'); (4) beschrijf pas daarna stijl, \
 belichting en materiaal-detail",
