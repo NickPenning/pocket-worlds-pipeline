@@ -103,39 +103,46 @@ def require_env(name: str) -> str:
 # Stap 1 — Concept + caption via Claude
 # ---------------------------------------------------------------------------
 
-def generate_concept(anthropic_api_key: str) -> dict:
+def generate_concept(anthropic_api_key: str, max_attempts: int = 3) -> dict:
     log("Vraag Claude om een nieuw diorama-concept...")
     client = Anthropic(api_key=anthropic_api_key)
-    response = client.messages.create(
-        model=ANTHROPIC_MODEL,
-        max_tokens=4096,
-        system=BRAND_SYSTEM_PROMPT,
-        messages=[
-            {
-                "role": "user",
-                "content": f"Genereer het concept voor vandaag, {datetime.now().strftime('%d %B %Y')}.",
-            }
-        ],
-    )
-    if response.stop_reason == "max_tokens":
-        sys.exit("Claude's antwoord is afgekapt door max_tokens — verhoog max_tokens in generate_concept().")
-
-    raw_text = "".join(block.text for block in response.content if block.type == "text").strip()
-    # Claude wikkelt het antwoord soms in een ```json-codeblok, ondanks de instructie dat niet te doen.
-    raw_text = re.sub(r"^```(?:json)?\s*", "", raw_text)
-    raw_text = re.sub(r"\s*```$", "", raw_text)
-    try:
-        concept = json.loads(raw_text)
-    except json.JSONDecodeError as e:
-        sys.exit(f"Kon Claude's antwoord niet als JSON lezen: {e}\n\nRuwe output:\n{raw_text}")
-
     required_keys = {"image_prompt", "caption", "hashtags"}
-    missing = required_keys - concept.keys()
-    if missing:
-        sys.exit(f"Claude's JSON mist velden: {missing}")
 
-    log(f"Concept: {concept.get('concept_titel', '(geen titel)')}")
-    return concept
+    for attempt in range(1, max_attempts + 1):
+        response = client.messages.create(
+            model=ANTHROPIC_MODEL,
+            max_tokens=4096,
+            system=BRAND_SYSTEM_PROMPT,
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"Genereer het concept voor vandaag, {datetime.now().strftime('%d %B %Y')}.",
+                }
+            ],
+        )
+        if response.stop_reason == "max_tokens":
+            log(f"  ...poging {attempt}/{max_attempts}: antwoord afgekapt door max_tokens, probeer opnieuw.")
+            continue
+
+        raw_text = "".join(block.text for block in response.content if block.type == "text").strip()
+        # Claude wikkelt het antwoord soms in een ```json-codeblok, ondanks de instructie dat niet te doen.
+        raw_text = re.sub(r"^```(?:json)?\s*", "", raw_text)
+        raw_text = re.sub(r"\s*```$", "", raw_text)
+        try:
+            concept = json.loads(raw_text)
+        except json.JSONDecodeError as e:
+            log(f"  ...poging {attempt}/{max_attempts}: ongeldige JSON ({e}), probeer opnieuw.")
+            continue
+
+        missing = required_keys - concept.keys()
+        if missing:
+            log(f"  ...poging {attempt}/{max_attempts}: velden ontbreken ({missing}), probeer opnieuw.")
+            continue
+
+        log(f"Concept: {concept.get('concept_titel', '(geen titel)')}")
+        return concept
+
+    sys.exit(f"Claude gaf {max_attempts} keer achter elkaar geen bruikbare JSON terug.")
 
 
 # ---------------------------------------------------------------------------
