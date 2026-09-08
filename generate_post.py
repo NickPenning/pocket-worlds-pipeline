@@ -74,7 +74,7 @@ van het object in de lucht zweven; (3) benoem de camera-hoek (bv. 'eye-level mac
 'top-down view into the open box') en waar het onderwerp in het frame staat (bv. 'object \
 centered, filling the lower two-thirds of the vertical frame'); (4) beschrijf pas daarna stijl, \
 belichting en materiaal-detail",
-  "caption": "Nederlandstalige of Engelstalige caption, kort en sfeervol, 1-3 zinnen",
+  "caption": "Engelstalige caption, kort en sfeervol, 1-3 zinnen",
   "hashtags": ["#..." , "#..."]
 }
 Gebruik 8 tot 15 relevante hashtags, mix van niche (miniatuurwerk, dioramakunst) en \
@@ -277,16 +277,20 @@ def create_pan_zoom_video(image_path: str, output_path: str, duration: int = 5) 
 # Stap 4 — Publiceren via Instagram Graph API
 # ---------------------------------------------------------------------------
 
-def create_media_container(ig_user_id: str, access_token: str, video_public_url: str, caption: str) -> str:
-    log("Maak media-container aan bij Instagram...")
+def create_media_container(
+    ig_user_id: str, access_token: str, video_public_url: str, media_type: str, caption: str = None
+) -> str:
+    log(f"Maak {media_type}-media-container aan bij Instagram...")
+    data = {
+        "media_type": media_type,
+        "video_url": video_public_url,
+        "access_token": access_token,
+    }
+    if caption:  # Stories ondersteunen geen caption-veld
+        data["caption"] = caption
     resp = requests.post(
         f"{IG_GRAPH_BASE}/{ig_user_id}/media",
-        data={
-            "media_type": "REELS",
-            "video_url": video_public_url,
-            "caption": caption,
-            "access_token": access_token,
-        },
+        data=data,
         timeout=30,
     )
     resp.raise_for_status()
@@ -317,7 +321,7 @@ def wait_until_ready(creation_id: str, access_token: str, max_wait_s: int = 600)
 
 
 def publish_media(ig_user_id: str, access_token: str, creation_id: str) -> None:
-    log("Publiceer de Reel...")
+    log("Publiceer...")
     resp = requests.post(
         f"{IG_GRAPH_BASE}/{ig_user_id}/media_publish",
         data={"creation_id": creation_id, "access_token": access_token},
@@ -376,9 +380,14 @@ def cmd_publish(date: str) -> None:
     video_public_url = f"{media_public_base_url.rstrip('/')}/{meta['video_filename']}"
     log(f"Publieke video-URL die Instagram gaat ophalen: {video_public_url}")
 
-    creation_id = create_media_container(ig_user_id, ig_access_token, video_public_url, meta["caption"])
+    creation_id = create_media_container(ig_user_id, ig_access_token, video_public_url, "REELS", meta["caption"])
     wait_until_ready(creation_id, ig_access_token)
     publish_media(ig_user_id, ig_access_token, creation_id)
+
+    # Ook delen als Story, zodat 'ie meteen in het verhaal van het account verschijnt.
+    story_creation_id = create_media_container(ig_user_id, ig_access_token, video_public_url, "STORIES")
+    wait_until_ready(story_creation_id, ig_access_token)
+    publish_media(ig_user_id, ig_access_token, story_creation_id)
 
 
 def main() -> None:
