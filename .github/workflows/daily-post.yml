@@ -2,10 +2,11 @@ name: Daily Instagram Reel
 
 on:
   schedule:
-    # 09:00 Amsterdam-tijd. GitHub Actions cron gebruikt UTC, dus dit is 07:00 UTC
-    # in de zomertijd (CEST) en 08:00 UTC in de wintertijd (CET). 07:00 UTC dekt
-    # het hele jaar redelijk goed; stel bij indien gewenst.
-    - cron: "0 7 * * *"
+    # 07:00 Amsterdam-tijd. GitHub Actions cron gebruikt UTC, dus dit is 05:00 UTC
+    # in de zomertijd (CEST, exact) en 06:00 UTC in de wintertijd (CET, dan 1 uur
+    # vroeger: 06:00 lokaal). 05:00 UTC dekt het hele jaar redelijk goed; stel bij
+    # indien gewenst.
+    - cron: "0 5 * * *"
   workflow_dispatch: {}  # laat je 'm ook handmatig starten via de GitHub-interface, handig om te testen
 
 permissions:

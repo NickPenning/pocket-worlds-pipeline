@@ -65,7 +65,7 @@ Ga naar het tabblad **Actions** in je repository, kies de workflow "Daily Instag
 Reel", en klik **Run workflow** om 'm handmatig één keer te draaien (in plaats van
 te wachten op de dagelijkse cron). Volg de logs live mee.
 
-Als dat goed gaat, staat de workflow al ingesteld om dagelijks om 09:00
+Als dat goed gaat, staat de workflow al ingesteld om dagelijks om 07:00
 (Nederlandse tijd, bij benadering) automatisch te draaien — verder geen omkijken
 naar nodig.
 
