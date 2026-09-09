@@ -65,15 +65,18 @@ Ga naar het tabblad **Actions** in je repository, kies de workflow "Daily Instag
 Reel", en klik **Run workflow** om 'm handmatig één keer te draaien (in plaats van
 te wachten op de dagelijkse cron). Volg de logs live mee.
 
-Als dat goed gaat, staat de workflow al ingesteld om dagelijks om 07:00
-(Nederlandse tijd, bij benadering) automatisch te draaien — verder geen omkijken
-naar nodig.
+Als dat goed gaat, staat de workflow al ingesteld om elke 6 uur automatisch te
+draaien, gestart op 07:00 (Nederlandse tijd, bij benadering) — verder geen
+omkijken naar nodig.
 
 ## Onderhoud
 
 - **Access token ververst niet vanzelf** in deze versie: hij verloopt na 60 dagen.
   Zet een herinnering, of laten we dit later automatiseren met het
   `refresh_access_token`-endpoint.
-- **Repo-grootte**: elke dag komt er een videobestand bij in `media/`. Voor een
-  hobby-schaal project is dat geen probleem, maar wil je dit op termijn opschonen,
+- **Repo-grootte**: er komt nu elke 6 uur (4x per dag) een videobestand bij in
+  `media/` i.p.v. 1x per dag — dat loopt dus 4x zo snel op. Voor een hobby-schaal
+  project nog steeds geen acuut probleem, maar wil je dit op termijn opschonen,
   dan kunnen we een stap toevoegen die oude bestanden verwijdert.
+- **API-kosten**: elke run kost een Claude-call en minstens één Leonardo-generatie,
+  dus 4x per dag draaien is ook 4x zoveel Anthropic/Leonardo-verbruik als 1x per dag.

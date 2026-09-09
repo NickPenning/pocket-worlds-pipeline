@@ -2,11 +2,10 @@ name: Daily Instagram Reel
 
 on:
   schedule:
-    # 07:00 Amsterdam-tijd. GitHub Actions cron gebruikt UTC, dus dit is 05:00 UTC
-    # in de zomertijd (CEST, exact) en 06:00 UTC in de wintertijd (CET, dan 1 uur
-    # vroeger: 06:00 lokaal). 05:00 UTC dekt het hele jaar redelijk goed; stel bij
-    # indien gewenst.
-    - cron: "0 5 * * *"
+    # Elke 6 uur, gestart op 07:00 Amsterdam-tijd (zomertijd/CEST = UTC+2, dus
+    # 05:00/11:00/17:00/23:00 UTC = 07:00/13:00/19:00/01:00 lokaal). In de
+    # wintertijd (CET) schuift dit 1 uur op (06:00/12:00/18:00/00:00 lokaal).
+    - cron: "0 5,11,17,23 * * *"
   workflow_dispatch: {}  # laat je 'm ook handmatig starten via de GitHub-interface, handig om te testen
 
 permissions:
@@ -27,6 +26,11 @@ jobs:
       - name: Installeer ffmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
+      - name: Bepaal unieke post-id voor deze run
+        # Bevat ook de tijd (niet alleen de datum), want er draaien nu meerdere runs per dag —
+        # zonder tijd in de bestandsnaam zou elke run de vorige overschrijven vóór publicatie.
+        run: echo "POST_ID=$(date -u +'%Y-%m-%dT%H%M')" >> "$GITHUB_ENV"
+
       - name: Genereer concept, beeld en video
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -38,7 +42,7 @@ jobs:
           git config user.name "pocket-worlds-bot"
           git config user.email "actions@github.com"
           git add media/
-          git commit -m "Content voor $(date +'%Y-%m-%d')"
+          git commit -m "Content voor $POST_ID"
           git push
 
       - name: Publiceer op Instagram
@@ -46,4 +50,4 @@ jobs:
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           MEDIA_PUBLIC_BASE_URL: ${{ secrets.MEDIA_PUBLIC_BASE_URL }}
-        run: python generate_post.py --publish "$(date +'%Y-%m-%d')"
+        run: python generate_post.py --publish "$POST_ID"

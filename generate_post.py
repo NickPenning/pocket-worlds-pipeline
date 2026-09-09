@@ -355,9 +355,12 @@ def cmd_generate() -> None:
     concept = generate_concept(anthropic_key)
     image_url = generate_image(leonardo_key, concept["image_prompt"])
 
-    today = datetime.now().strftime("%Y-%m-%d")
-    video_filename = f"{today}.mp4"
-    meta_filename = f"{today}.json"
+    # POST_ID is optioneel: de workflow zet 'm op datum+tijd zodat meerdere runs op één dag
+    # (bv. elke 6 uur) niet elkaars bestanden overschrijven. Lokaal draaien zonder POST_ID
+    # gebruikt gewoon de datum, zoals voorheen.
+    post_id = os.environ.get("POST_ID") or datetime.now().strftime("%Y-%m-%d")
+    video_filename = f"{post_id}.mp4"
+    meta_filename = f"{post_id}.json"
     os.makedirs("media", exist_ok=True)
 
     with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
