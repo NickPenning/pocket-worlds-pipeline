@@ -2,10 +2,11 @@ name: Daily Instagram Reel
 
 on:
   schedule:
-    # Elke 6 uur, gestart op 07:00 Amsterdam-tijd (zomertijd/CEST = UTC+2, dus
-    # 05:00/11:00/17:00/23:00 UTC = 07:00/13:00/19:00/01:00 lokaal). In de
-    # wintertijd (CET) schuift dit 1 uur op (06:00/12:00/18:00/00:00 lokaal).
-    - cron: "0 5,11,17,23 * * *"
+    # 1x per dag, 07:00 Amsterdam-tijd. GitHub Actions cron gebruikt UTC, dus dit
+    # is 05:00 UTC in de zomertijd (CEST, exact) en 06:00 UTC in de wintertijd
+    # (CET, dan 1 uur vroeger: 06:00 lokaal). 05:00 UTC dekt het hele jaar
+    # redelijk goed; stel bij indien gewenst.
+    - cron: "0 5 * * *"
   workflow_dispatch: {}  # laat je 'm ook handmatig starten via de GitHub-interface, handig om te testen
 
 permissions:
@@ -27,8 +28,8 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
       - name: Bepaal unieke post-id voor deze run
-        # Bevat ook de tijd (niet alleen de datum), want er draaien nu meerdere runs per dag —
-        # zonder tijd in de bestandsnaam zou elke run de vorige overschrijven vóór publicatie.
+        # Bevat ook de tijd (niet alleen de datum) zodat een handmatige extra run op dezelfde
+        # dag (via workflow_dispatch) de dagelijkse post niet overschrijft vóór publicatie.
         run: echo "POST_ID=$(date -u +'%Y-%m-%dT%H%M')" >> "$GITHUB_ENV"
 
       - name: Genereer concept, beeld en video

@@ -177,24 +177,35 @@ def _find_leonardo_model_id(leonardo_api_key: str, model_name: str) -> str:
     sys.exit(f"Kon Leonardo-model '{model_name}' niet vinden via platformModels.")
 
 
-def generate_image(leonardo_api_key: str, image_prompt: str) -> str:
+def generate_image(leonardo_api_key: str, image_prompt: str, max_attempts: int = 3) -> str:
     log("Genereer still-afbeelding via Leonardo.ai...")
     model_id = _find_leonardo_model_id(leonardo_api_key, LEONARDO_PHOTOREAL_MODEL_NAME)
-    resp = requests.post(
-        f"{LEONARDO_BASE}/generations",
-        headers=leonardo_headers(leonardo_api_key),
-        json={
-            "prompt": image_prompt,
-            "num_images": 1,
-            "width": VIDEO_WIDTH,
-            "height": VIDEO_HEIGHT,
-            "modelId": model_id,
-            "presetStyle": "CINEMATIC",
-            "alchemy": True,
-        },
-        timeout=30,
-    )
-    resp.raise_for_status()
+
+    for attempt in range(1, max_attempts + 1):
+        resp = requests.post(
+            f"{LEONARDO_BASE}/generations",
+            headers=leonardo_headers(leonardo_api_key),
+            json={
+                "prompt": image_prompt,
+                "num_images": 1,
+                "width": VIDEO_WIDTH,
+                "height": VIDEO_HEIGHT,
+                "modelId": model_id,
+                "presetStyle": "CINEMATIC",
+                "alchemy": True,
+            },
+            timeout=30,
+        )
+        if resp.ok:
+            break
+        log(
+            f"  ...poging {attempt}/{max_attempts}: Leonardo gaf {resp.status_code} terug "
+            f"({resp.text[:300]}), probeer opnieuw."
+        )
+        if attempt == max_attempts:
+            resp.raise_for_status()
+        time.sleep(5)
+
     generation_id = resp.json()["sdGenerationJob"]["generationId"]
 
     _, image_url = _poll_leonardo_generation(leonardo_api_key, generation_id)
