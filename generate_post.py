@@ -54,37 +54,81 @@ VIDEO_HEIGHT = 1536
 BRAND_SYSTEM_PROMPT = """\
 Je bedenkt dagelijkse content voor het Instagram-account "pocket.worlds.ai".
 Het account toont surrealistische, hyperdetailleerde miniatuur-diorama-werelden:
-kleine complete werelden in onverwachte objecten (een terrarium, een lamp, een \
-theekopje, een horloge), fotorealistisch gerenderd, met warme, filmische belichting \
-en een gevoel van verwondering en schaal-illusie.
+kleine complete werelden verstopt in alledaagse objecten, fotorealistisch gerenderd, \
+met een gevoel van verwondering en schaal-illusie.
 
-Bedenk elke keer een NIEUW, onderscheidend concept — varieer settings, seizoenen, \
-kleurenpaletten en het object waarin de wereld verstopt zit. Vermijd herhaling van \
-eerdere clichés (geen generieke kristallen bollen, geen simpele terrariums zonder twist).
+DIVERSITEIT IS BELANGRIJKER DAN EEN "SIGNATURE LOOK". Kies bij elk nieuw concept BEWUST \
+een object-categorie en een sfeer/seizoen die duidelijk verschillen van voor de hand liggende \
+keuzes zoals zakhorloges, sardineblikjes en herfsttinten/haventjes — die zijn al veel gebruikt. \
+Roteer actief tussen categorieën, gebruik ze niet allemaal steeds hetzelfde soort object en \
+seizoen:
+- Objectcategorieën (kies uit sterk uiteenlopende soorten, niet steeds tijd/zee-gerelateerd): \
+sieraden (ring, medaillon, manchetknoop-doosje), keukengerei (theepot, eierdop, kruidenpotje, \
+suikerklontjesdoos), gereedschap (naaidoos, verfpotje, inktpot), muziekinstrumenten \
+(harmonica, vioolkam, pianotoets), spelletjes (dobbelsteen, dominosteen, schaakstuk), \
+natuurlijke objecten (walnootdop, eikeldop, schelp, cocon), kantoorartikelen \
+(nietmachine, potloodslijpsel, postzegel, boekrug), optiek (brillenkoker, camera-lens, \
+verrekijker), persoonlijke voorwerpen (portemonnee-muntvakje, knopendoos, lippenstift-kokertje, \
+horlogekastje), speelgoed (knikker, poppenhuis-kamertje, tinnen soldaatje).
+- Sferen/seizoenen (varieer nadrukkelijk, niet steeds herfst): lentebloesem, zomerse hitte, \
+tropische moesson, strenge winter met sneeuwstorm, noorderlicht, woestijnschemering, \
+onderwaterrif, vulkanische gloed, feestelijke winternacht, mistige hooglandochtend, \
+neon nachtstad, jungle-regenbui, kustelijke storm, gouden savanne-avond, alpien sneeuwlandschap, \
+carnavalsnacht, oogstmaan, lentemarkt.
+
+Bedenk elke keer een NIEUW, onderscheidend concept. Vermijd herhaling van eerdere clichés \
+(geen generieke kristallen bollen, geen simpele terrariums zonder twist).
 
 Antwoord ALLEEN met geldige JSON, geen uitleg, geen markdown-codeblok, in dit formaat:
 {
   "concept_titel": "korte titel voor eigen administratie",
+  "object": "kort Engels label voor het object waarin de wereld verstopt zit, bv. 'sugar cube box', \
+'violin bridge', 'acorn cap'",
+  "mood": "kort Engels label voor de sfeer/het seizoen, bv. 'tropical monsoon', 'alpine snowfall', \
+'neon night market'",
   "image_prompt": "gedetailleerde Engelstalige prompt voor een text-to-image model, \
 geoptimaliseerd voor een verticale 9:16 Reel-still. Beschrijf de COMPOSITIE EXPLICIET, niet \
-alleen sfeerwoorden: (1) benoem het alledaagse object (bv. matchbox, teacup, pocket watch) als \
-duidelijk herkenbaar hoofdonderwerp, scherp in beeld; (2) beschrijf dat het object omgedraaid, \
-geopend of gekanteld is zodat de HOLLE BINNENKANT naar de camera gericht is, en dat de \
-miniatuurwereld daadwerkelijk IN die holte zit — met zichtbare wanden/rand van het object rondom \
-de wereld die diepte en fysieke omsluiting tonen (bv. 'the thimble is tipped on its side, opening \
-facing the camera, so the viewer looks directly into its hollow interior'). Vermijd expliciet een \
-plat of geprojecteerd effect waarbij de wereld op het buitenoppervlak lijkt te zijn geplakt of \
-geschilderd — het moet ondubbelzinnig een fysieke ruimte zijn waar de kijker in kijkt, geen losse \
-elementen die los van het object in de lucht zweven; (3) benoem de camera-hoek (bv. 'eye-level macro shot', \
-'top-down view into the open box') en waar het onderwerp in het frame staat (bv. 'object \
-centered, filling the lower two-thirds of the vertical frame'); (4) beschrijf pas daarna stijl, \
-belichting en materiaal-detail",
+alleen sfeerwoorden: (1) benoem het alledaagse object als duidelijk herkenbaar hoofdonderwerp, \
+scherp in beeld; (2) beschrijf dat het object omgedraaid, geopend of gekanteld is zodat de HOLLE \
+BINNENKANT naar de camera gericht is, en dat de miniatuurwereld daadwerkelijk IN die holte zit — \
+met zichtbare wanden/rand van het object rondom de wereld die diepte en fysieke omsluiting tonen \
+(bv. 'the thimble is tipped on its side, opening facing the camera, so the viewer looks directly \
+into its hollow interior'). Vermijd expliciet een plat of geprojecteerd effect waarbij de wereld \
+op het buitenoppervlak lijkt te zijn geplakt of geschilderd — het moet ondubbelzinnig een fysieke \
+ruimte zijn waar de kijker in kijkt, geen losse elementen die los van het object in de lucht \
+zweven; (3) benoem de camera-hoek (bv. 'eye-level macro shot', 'top-down view into the open box') \
+en waar het onderwerp in het frame staat (bv. 'object centered, filling the lower two-thirds of \
+the vertical frame'); (4) beschrijf pas daarna stijl, belichting en materiaal-detail, passend bij \
+de gekozen sfeer/het seizoen (dus NIET standaard warm/filmisch/gouden-uur als de sfeer dat niet \
+is — een winterscène mag koel en blauw ogen, een tropische scène fel en vochtig, etc.)",
   "caption": "Engelstalige caption, kort en sfeervol, 1-3 zinnen",
   "hashtags": ["#..." , "#..."]
 }
 Gebruik 8 tot 15 relevante hashtags, mix van niche (miniatuurwerk, dioramakunst) en \
 breder bereik (AI art, surreal art).
 """
+
+# Hoeveel recente concepten (object + sfeer) worden meegegeven aan Claude om herhaling te
+# vermijden. Gebaseerd op media/*.json — groeit vanzelf mee zodra er meer posts bijkomen.
+RECENT_CONCEPT_HISTORY = 15
+
+
+def _recent_concepts(limit: int = RECENT_CONCEPT_HISTORY) -> list:
+    """Leest de laatste 'limit' entries uit media/*.json die een 'object'/'mood'-veld hebben
+    (oudere posts van vóór deze velden bestonden, worden overgeslagen)."""
+    if not os.path.isdir("media"):
+        return []
+    filenames = sorted(f for f in os.listdir("media") if f.endswith(".json"))
+    recent = []
+    for filename in filenames[-limit:]:
+        try:
+            with open(os.path.join("media", filename)) as f:
+                data = json.load(f)
+        except (json.JSONDecodeError, OSError):
+            continue
+        if data.get("object") or data.get("mood"):
+            recent.append({"object": data.get("object"), "mood": data.get("mood")})
+    return recent
 
 
 def log(msg: str) -> None:
@@ -106,19 +150,23 @@ def require_env(name: str) -> str:
 def generate_concept(anthropic_api_key: str, max_attempts: int = 3) -> dict:
     log("Vraag Claude om een nieuw diorama-concept...")
     client = Anthropic(api_key=anthropic_api_key)
-    required_keys = {"image_prompt", "caption", "hashtags"}
+    required_keys = {"image_prompt", "caption", "hashtags", "object", "mood"}
+
+    user_message = f"Genereer het concept voor vandaag, {datetime.now().strftime('%d %B %Y')}."
+    recent = _recent_concepts()
+    recent_objects = sorted({r["object"] for r in recent if r.get("object")})
+    recent_moods = sorted({r["mood"] for r in recent if r.get("mood")})
+    if recent_objects:
+        user_message += f"\n\nVermijd deze recent al gebruikte objecten: {', '.join(recent_objects)}."
+    if recent_moods:
+        user_message += f"\n\nVermijd deze recent al gebruikte sferen/seizoenen: {', '.join(recent_moods)}."
 
     for attempt in range(1, max_attempts + 1):
         response = client.messages.create(
             model=ANTHROPIC_MODEL,
             max_tokens=4096,
             system=BRAND_SYSTEM_PROMPT,
-            messages=[
-                {
-                    "role": "user",
-                    "content": f"Genereer het concept voor vandaag, {datetime.now().strftime('%d %B %Y')}.",
-                }
-            ],
+            messages=[{"role": "user", "content": user_message}],
         )
         if response.stop_reason == "max_tokens":
             log(f"  ...poging {attempt}/{max_attempts}: antwoord afgekapt door max_tokens, probeer opnieuw.")
@@ -384,7 +432,16 @@ def cmd_generate() -> None:
 
     caption = concept["caption"] + "\n\n" + " ".join(concept["hashtags"])
     with open(os.path.join("media", meta_filename), "w") as f:
-        json.dump({"video_filename": video_filename, "caption": caption}, f, indent=2)
+        json.dump(
+            {
+                "video_filename": video_filename,
+                "caption": caption,
+                "object": concept["object"],
+                "mood": concept["mood"],
+            },
+            f,
+            indent=2,
+        )
 
     log(f"Klaar. Video: media/{video_filename}  |  Metadata: media/{meta_filename}")
     log("Volgende stap: commit + push deze twee bestanden, en draai dan `--publish` voor dezelfde datum.")
